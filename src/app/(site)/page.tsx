@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { DeploymentErrorBoundary } from "@/components/global-deployment/DeploymentErrorBoundary";
 import { GlobalDeploymentHero } from "@/components/global-deployment/GlobalDeploymentHero";
 import { GlobalDeploymentView } from "@/components/global-deployment/GlobalDeploymentView";
-import { LoadingSkeleton } from "@/components/global-deployment/LoadingSkeleton";
+import { GlobalDeploymentPageLoader } from "@/components/global-deployment/GlobalDeploymentPageLoader";
 import { getPublicDeploymentTree } from "@/lib/deployments/publicTree";
 
 export const dynamic = "force-dynamic";
@@ -15,11 +15,7 @@ export const metadata: Metadata = {
 };
 
 function ViewFallback() {
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <LoadingSkeleton />
-    </div>
-  );
+  return <GlobalDeploymentPageLoader />;
 }
 
 export default async function GlobalDeploymentHomePage() {

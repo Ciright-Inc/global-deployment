@@ -58,6 +58,16 @@ export function keyraPressUrl(): string {
   return trimSlash(process.env.NEXT_PUBLIC_PRESS_URL?.trim() || "https://press.keyra.ie");
 }
 
+/** governments.keyra.ie */
+export function keyraGovernmentsUrl(): string {
+  return trimSlash(process.env.NEXT_PUBLIC_GOVERNMENTS_URL?.trim() || "https://governments.keyra.ie");
+}
+
+/** partners.keyra.ie */
+export function keyraPartnersUrl(): string {
+  return trimSlash(process.env.NEXT_PUBLIC_PARTNERS_URL?.trim() || "https://partners.keyra.ie");
+}
+
 /** This marketing site (e.g. https://keyra.ie or http://localhost:3030). */
 export function keyraMarketingOrigin(): string {
   return trimSlash(
@@ -143,11 +153,16 @@ export function getKeyraEcosystemAppLinks(): KeyraEcosystemAppLink[] {
       internalPath: "/trust",
     },
     {
-      id: "global",
-      label: "Global deployment",
-      description: "Deployment map",
-      href: keyraGlobalDeploymentUrl(),
-      internalPath: "/global-deployment",
+      id: "governments",
+      label: "Governments",
+      description: "Government programs",
+      href: keyraGovernmentsUrl(),
+    },
+    {
+      id: "partners",
+      label: "Partners",
+      description: "Partner programs",
+      href: keyraPartnersUrl(),
     },
   ];
 }
