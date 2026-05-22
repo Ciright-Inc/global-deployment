@@ -2,17 +2,20 @@
 
 import { getKeyraEcosystemAppLinks, keyraMarketingOrigin, type KeyraEcosystemAppLink } from "@/lib/keyraAppUrls";
 
-const links = [
-  { href: "/#problem", label: "Why identity" },
-  { href: "/#missing-layer", label: "The shift" },
-  { href: "/#for", label: "Who it's for" },
-  { href: "/#global", label: "Global" },
-  { href: "/developers", label: "Developers" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact us" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
-];
+type SiteLink = { href: string; label: string };
+
+function siteLinks(marketing: string): SiteLink[] {
+  return [
+    { href: `${marketing}/#problem`, label: "Why identity" },
+    { href: `${marketing}/#missing-layer`, label: "The shift" },
+    { href: `${marketing}/#for`, label: "Who it's for" },
+    { href: `${marketing}/#global`, label: "Global" },
+    { href: `${marketing}/faq`, label: "FAQ" },
+    { href: `${marketing}/contact`, label: "Contact us" },
+    { href: `${marketing}/privacy`, label: "Privacy" },
+    { href: `${marketing}/terms`, label: "Terms" },
+  ];
+}
 
 function splitInHalf<T>(arr: T[]): [T[], T[]] {
   const mid = Math.ceil(arr.length / 2);
@@ -46,11 +49,8 @@ export function SiteFooter() {
   const marketing = keyraMarketingOrigin();
   const appLinks = getKeyraEcosystemAppLinks();
   const [appLinksLeft, appLinksRight] = splitInHalf(appLinks);
-  const siteLinks = links.map((link) => ({
-    ...link,
-    href: `${marketing}${link.href}`,
-  }));
-  const [siteLinksLeft, siteLinksRight] = splitInHalf(siteLinks);
+  const links = siteLinks(marketing);
+  const [siteLinksLeft, siteLinksRight] = splitInHalf(links);
   const year = new Date().getFullYear();
 
   return (

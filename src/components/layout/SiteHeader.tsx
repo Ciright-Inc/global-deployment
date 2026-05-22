@@ -6,16 +6,20 @@ import { AccountMenu } from "./AccountMenu";
 import { KeyraAppLauncher } from "./KeyraAppLauncher";
 import { MobileNav } from "./MobileNav";
 import { KeyraLogo } from "@/components/brand/KeyraLogo";
-import { buildGetStartedAccessUrl, keyraMarketingOrigin } from "@/lib/keyraAppUrls";
+import { buildGetStartedAccessUrl, keyraDeveloperPortalUrl, keyraMarketingOrigin } from "@/lib/keyraAppUrls";
 import { globalDeploymentOrigin } from "@/lib/site-branding";
 
-const nav = [
-  { href: "/#problem", label: "Why identity" },
-  { href: "/#missing-layer", label: "The shift" },
-  { href: "/#for", label: "Who it's for" },
-  { href: "/#global", label: "Global" },
-  { href: "/developers", label: "Developers" },
-];
+type NavItem = { href: string; label: string; external?: boolean };
+
+function buildNav(marketing: string): NavItem[] {
+  return [
+    { href: `${marketing}/#problem`, label: "Why identity" },
+    { href: `${marketing}/#missing-layer`, label: "The shift" },
+    { href: `${marketing}/#for`, label: "Who it's for" },
+    { href: `${marketing}/#global`, label: "Global" },
+    { href: keyraDeveloperPortalUrl(), label: "Developers", external: true },
+  ];
+}
 
 export function SiteHeader() {
   const marketing = keyraMarketingOrigin();
@@ -23,6 +27,7 @@ export function SiteHeader() {
     () => buildGetStartedAccessUrl(`${globalDeploymentOrigin()}/`),
     [],
   );
+  const nav = useMemo(() => buildNav(marketing), [marketing]);
 
   return (
     <header className="keyra-site-header-shell z-[var(--keyra-z-header)]">
@@ -44,9 +49,10 @@ export function SiteHeader() {
             {nav.map((item) => (
               <a
                 key={item.href}
-                href={`${marketing}${item.href}`}
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : "noopener noreferrer"}
                 className="relative flex min-w-fit shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium leading-relaxed text-keyra-primary/90 transition-colors hover:bg-black/[0.05] hover:text-keyra-primary lg:px-4"
-                rel="noopener noreferrer"
               >
                 {item.label}
               </a>

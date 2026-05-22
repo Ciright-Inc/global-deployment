@@ -598,6 +598,62 @@ html[data-keyra-lane="developer"] .keyra-code-block {
   animation: keyra-drift 26s ease-in-out infinite;
 }
 
+@keyframes keyra-trust-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes keyra-trust-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.82);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
+@keyframes keyra-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.keyra-trust-pulse {
+  animation: keyra-trust-pulse 1.8s var(--keyra-ease-trust, cubic-bezier(0.22, 0.61, 0.36, 1)) infinite;
+}
+
+.keyra-trust-ring {
+  animation: keyra-trust-ring 2.4s var(--keyra-ease-trust, cubic-bezier(0.22, 0.61, 0.36, 1)) infinite;
+}
+
+.keyra-trust-ring-delay {
+  animation-delay: 0.55s;
+}
+
+.keyra-skeleton {
+  border-radius: var(--keyra-radius-md, 8px);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-strong) 0%,
+    var(--color-canvas-soft) 45%,
+    var(--color-surface-strong) 90%
+  );
+  background-size: 200% 100%;
+  animation: keyra-skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-keyra-float,
   .animate-keyra-float-delayed,
@@ -609,5 +665,11 @@ html[data-keyra-lane="developer"] .keyra-code-block {
 
   .keyra-card {
     transition: none;
+  }
+
+  .keyra-trust-pulse,
+  .keyra-trust-ring,
+  .keyra-skeleton {
+    animation: none !important;
   }
 }

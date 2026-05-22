@@ -3,34 +3,30 @@ import { Suspense } from "react";
 import { DeploymentErrorBoundary } from "@/components/global-deployment/DeploymentErrorBoundary";
 import { GlobalDeploymentHero } from "@/components/global-deployment/GlobalDeploymentHero";
 import { GlobalDeploymentView } from "@/components/global-deployment/GlobalDeploymentView";
-import { LoadingSkeleton } from "@/components/global-deployment/LoadingSkeleton";
-import { getPublicDeploymentTree } from "@/lib/deployments/publicTree";
+import { GlobalDeploymentPageLoader } from "@/components/global-deployment/GlobalDeploymentPageLoader";
+import { getAdminRegistryTree } from "@/lib/deployments/adminRegistryTree";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Global deployment",
   description:
-    "Explore Keyra's published regional, country, and operator deployment posture — calm, structured, and institutionally grounded.",
+    "Explore Keyra regional, country, and operator deployment posture from the live admin registry.",
 };
 
 function ViewFallback() {
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <LoadingSkeleton />
-    </div>
-  );
+  return <GlobalDeploymentPageLoader />;
 }
 
 export default async function GlobalDeploymentHomePage() {
-  const tree = await getPublicDeploymentTree();
+  const adminTree = await getAdminRegistryTree();
 
   return (
     <>
       <GlobalDeploymentHero />
       <DeploymentErrorBoundary>
         <Suspense fallback={<ViewFallback />}>
-          <GlobalDeploymentView initialTree={tree} />
+          <GlobalDeploymentView initialAdminTree={adminTree} />
         </Suspense>
       </DeploymentErrorBoundary>
     </>

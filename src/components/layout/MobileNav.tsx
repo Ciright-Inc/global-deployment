@@ -4,17 +4,21 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { useKeyraSession } from "@/contexts/KeyraSessionContext";
-import { buildGetStartedAccessUrl, keyraMarketingOrigin } from "@/lib/keyraAppUrls";
+import { buildGetStartedAccessUrl, keyraDeveloperPortalUrl, keyraMarketingOrigin } from "@/lib/keyraAppUrls";
 import { globalDeploymentOrigin } from "@/lib/site-branding";
 
-const links = [
-  { href: "/#problem", label: "Why identity" },
-  { href: "/#missing-layer", label: "The shift" },
-  { href: "/#for", label: "Who it's for" },
-  { href: "/#global", label: "Global" },
-  { href: "/developers", label: "Developers" },
-  { href: "/", label: "Be Protected Online" },
-];
+type NavLink = { href: string; label: string; external?: boolean };
+
+function buildLinks(marketing: string): NavLink[] {
+  return [
+    { href: `${marketing}/#problem`, label: "Why identity" },
+    { href: `${marketing}/#missing-layer`, label: "The shift" },
+    { href: `${marketing}/#for`, label: "Who it's for" },
+    { href: `${marketing}/#global`, label: "Global" },
+    { href: keyraDeveloperPortalUrl(), label: "Developers", external: true },
+    { href: `${marketing}/`, label: "Be Protected Online" },
+  ];
+}
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -24,6 +28,7 @@ export function MobileNav() {
     () => buildGetStartedAccessUrl(`${globalDeploymentOrigin()}/`),
     [],
   );
+  const links = useMemo(() => buildLinks(marketing), [marketing]);
 
   useEffect(() => {
     if (!open) return;
@@ -71,12 +76,13 @@ export function MobileNav() {
             >
               <ul className="flex flex-col gap-1">
                 {links.map((item) => (
-                  <li key={item.href}>
+                  <li key={item.label}>
                     <a
-                      href={`${marketing}${item.href}`}
+                      href={item.href}
+                      target={item.external ? "_blank" : undefined}
+                      rel="noopener noreferrer"
                       onClick={() => setOpen(false)}
                       className="block rounded-lg px-3 py-2.5 text-sm font-medium text-keyra-primary hover:bg-keyra-surface"
-                      rel="noopener noreferrer"
                     >
                       {item.label}
                     </a>

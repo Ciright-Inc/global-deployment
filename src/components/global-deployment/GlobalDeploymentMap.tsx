@@ -17,6 +17,7 @@ import {
 } from "@/lib/deployments/deployment-map-utils";
 import { CountryNode } from "@/components/global-deployment/CountryNode";
 import { DeploymentHoverCard } from "@/components/global-deployment/DeploymentHoverCard";
+import { KeyraTrustLoader } from "@/components/ui/KeyraTrustLoader";
 import type { UseDeploymentMapDataReturn } from "@/components/global-deployment/useDeploymentMapData";
 
 const SCALE_X = MAP_W / 960;
@@ -83,6 +84,7 @@ export function GlobalDeploymentMap({
   const [ptr, setPtr] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState<ClusteredMapNode | null>(null);
   const [hoverVisible, setHoverVisible] = useState(false);
+  const [mapTextureReady, setMapTextureReady] = useState(false);
   const panRef = useRef(pan);
   const zoomRef = useRef(zoom);
   useLayoutEffect(() => {
@@ -94,6 +96,21 @@ export function GlobalDeploymentMap({
     const allowed = new Set(tree.mapKeys);
     return Object.keys(WORLD_REGION_PATHS).filter((k) => allowed.has(k));
   }, [tree.mapKeys]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (!cancelled) setMapTextureReady(true);
+    };
+    img.onerror = () => {
+      if (!cancelled) setMapTextureReady(true);
+    };
+    img.src = MAP_TEXTURE_URL;
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const visibleForArcs = useMemo(() => {
     if (!selectedMapKey) return allNodes;
@@ -188,6 +205,14 @@ export function GlobalDeploymentMap({
         }}
         onWheel={onWheel}
       >
+        {!mapTextureReady ? (
+          <KeyraTrustLoader
+            variant="overlay"
+            label="Loading map"
+            className="bg-[rgba(6,14,24,0.82)] backdrop-blur-[2px]"
+          />
+        ) : null}
+
         <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[min(18rem,calc(100%-1.5rem))] rounded-lg border border-white/15 bg-[rgba(8,18,32,0.78)] px-3 py-2 text-[11px] text-sky-50 backdrop-blur-md">
           {hovered ? (
             <span className="font-medium text-white">
