@@ -1,9 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import type { WheelEvent } from "react";
 import { useDeferredReducedMotion } from "@/lib/useDeferredReducedMotion";
-import { WORLD_REGION_PATHS } from "@/lib/deployments/worldRegionPaths";
 import { WORLD_COUNTRY_PATHS, WORLD_MAP_VIEWBOX_WIRE } from "@/lib/deployments/worldWireframePaths.generated";
 import {
   MAP_H,
@@ -20,8 +18,6 @@ import { DeploymentHoverCard } from "@/components/global-deployment/DeploymentHo
 import { KeyraTrustLoader } from "@/components/ui/KeyraTrustLoader";
 import type { UseDeploymentMapDataReturn } from "@/components/global-deployment/useDeploymentMapData";
 
-const SCALE_X = MAP_W / 960;
-const SCALE_Y = MAP_H / 480;
 const CX = MAP_W / 2;
 const CY = MAP_H / 2;
 /** Tile the equirectangular world horizontally so pan/zoom never shows empty sides. */
@@ -65,26 +61,29 @@ function bboxForNodes(nodes: DeploymentMapFlatNode[], pad: number) {
 
 export function GlobalDeploymentMap({
   mapData,
-  selectedMapKey,
+  selectedRegionId,
   onCountryInspect,
   inspectCountryId,
   embedded = false,
 }: {
-  mapData: Pick<UseDeploymentMapDataReturn, "tree" | "clusteredNodes" | "dimmedIsoKeys" | "allNodes" | "zoom" | "setZoom">;
-  selectedMapKey: string | null;
-  onSelectMapKey?: (mapKey: string | null) => void;
+  mapData: Pick<
+    UseDeploymentMapDataReturn,
+    "clusteredNodes" | "dimmedIsoKeys" | "allNodes" | "zoom" | "setZoom"
+  >;
+  selectedRegionId: string | null;
   onCountryInspect: (countryId: string | null) => void;
   inspectCountryId: string | null;
   embedded?: boolean;
 }) {
   const reduce = useDeferredReducedMotion();
-  const { clusteredNodes, dimmedIsoKeys, allNodes, tree, zoom, setZoom } = mapData;
+  const { clusteredNodes, dimmedIsoKeys, allNodes, zoom, setZoom } = mapData;
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const drag = useRef<{ active: boolean; sx: number; sy: number; px: number; py: number } | null>(null);
   const [ptr, setPtr] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState<ClusteredMapNode | null>(null);
   const [hoverVisible, setHoverVisible] = useState(false);
   const [mapTextureReady, setMapTextureReady] = useState(false);
+  const mapSurfaceRef = useRef<HTMLDivElement>(null);
   const panRef = useRef(pan);
   const zoomRef = useRef(zoom);
   useLayoutEffect(() => {
@@ -92,10 +91,26 @@ export function GlobalDeploymentMap({
     zoomRef.current = zoom;
   }, [pan, zoom]);
 
-  const regionKeys = useMemo(() => {
-    const allowed = new Set(tree.mapKeys);
-    return Object.keys(WORLD_REGION_PATHS).filter((k) => allowed.has(k));
-  }, [tree.mapKeys]);
+  /** React onWheel is passive — must use a native listener to block page scroll while zooming. */
+  useEffect(() => {
+    const el = mapSurfaceRef.current;
+    if (!el) return;
+    const onWheelNative = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const delta = e.deltaY > 0 ? -0.06 : 0.06;
+      setZoom((z) => Math.min(2.4, Math.max(0.72, Number((z + delta).toFixed(3)))));
+    };
+    el.addEventListener("wheel", onWheelNative, { passive: false });
+    return () => el.removeEventListener("wheel", onWheelNative);
+  }, [setZoom]);
+
+  /** Tight ring around the selected admin region's markets — not the macro continent blob. */
+  const selectionRing = useMemo(() => {
+    if (!selectedRegionId) return null;
+    const nodes = allNodes.filter((n) => n.regionId === selectedRegionId);
+    return bboxForNodes(nodes, 36);
+  }, [selectedRegionId, allNodes]);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,23 +128,23 @@ export function GlobalDeploymentMap({
   }, []);
 
   const visibleForArcs = useMemo(() => {
-    if (!selectedMapKey) return allNodes;
-    return allNodes.filter((n) => n.mapKey === selectedMapKey);
-  }, [allNodes, selectedMapKey]);
+    if (!selectedRegionId) return allNodes;
+    return allNodes.filter((n) => n.regionId === selectedRegionId);
+  }, [allNodes, selectedRegionId]);
 
   const arcs = useMemo(() => deploymentNetworkArcs(visibleForArcs), [visibleForArcs]);
 
   const flySignature = useMemo(() => {
-    if (!selectedMapKey) return "";
-    const nodes = allNodes.filter((n) => n.mapKey === selectedMapKey);
+    if (!selectedRegionId) return "";
+    const nodes = allNodes.filter((n) => n.regionId === selectedRegionId);
     const b = bboxForNodes(nodes, 48);
-    if (!b) return `${selectedMapKey}|empty`;
-    return `${selectedMapKey}|${nodes.length}|${b.bx.toFixed(0)}|${b.by.toFixed(0)}|${b.bw.toFixed(0)}|${b.bh.toFixed(0)}`;
-  }, [selectedMapKey, allNodes]);
+    if (!b) return `${selectedRegionId}|empty`;
+    return `${selectedRegionId}|${nodes.length}|${b.bx.toFixed(0)}|${b.by.toFixed(0)}|${b.bw.toFixed(0)}|${b.bh.toFixed(0)}`;
+  }, [selectedRegionId, allNodes]);
 
   useEffect(() => {
-    if (!selectedMapKey) return;
-    const nodes = allNodes.filter((n) => n.mapKey === selectedMapKey);
+    if (!selectedRegionId) return;
+    const nodes = allNodes.filter((n) => n.regionId === selectedRegionId);
     const box = bboxForNodes(nodes, 48);
     if (!box) return;
 
@@ -160,16 +175,7 @@ export function GlobalDeploymentMap({
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [flySignature, selectedMapKey, reduce, allNodes, setZoom]);
-
-  const onWheel = useCallback(
-    (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.06 : 0.06;
-      setZoom((z) => Math.min(2.4, Math.max(0.72, Number((z + delta).toFixed(3)))));
-    },
-    [setZoom],
-  );
+  }, [flySignature, selectedRegionId, reduce, allNodes, setZoom]);
 
   const resetView = useCallback(() => {
     setZoom(1);
@@ -181,12 +187,13 @@ export function GlobalDeploymentMap({
   return (
     <div className={embedded ? "space-y-2" : "space-y-3"}>
       <div
+        ref={mapSurfaceRef}
         className={
           embedded
             ? "relative overflow-hidden rounded-[var(--keyra-radius-lg)]"
             : "relative overflow-hidden rounded-[var(--keyra-radius-sheet)] border border-keyra-border"
         }
-        style={{ background: MAP_SURFACE.oceanDeep }}
+        style={{ background: MAP_SURFACE.oceanDeep, overscrollBehavior: "contain" }}
         onPointerMove={(e) => {
           setPtr({ x: e.clientX, y: e.clientY });
           if (!drag.current?.active) return;
@@ -203,7 +210,6 @@ export function GlobalDeploymentMap({
           drag.current = null;
           setHoverVisible(false);
         }}
-        onWheel={onWheel}
       >
         {!mapTextureReady ? (
           <KeyraTrustLoader
@@ -311,23 +317,20 @@ export function GlobalDeploymentMap({
               </g>
             ))}
 
-            <g transform={`scale(${SCALE_X} ${SCALE_Y})`} className="pointer-events-none">
-              {regionKeys.map((key) => {
-                const meta = WORLD_REGION_PATHS[key];
-                if (!meta || selectedMapKey !== key) return null;
-                return (
-                  <path
-                    key={key}
-                    d={meta.d}
-                    aria-hidden
-                    fill={MAP_SURFACE.regionFill}
-                    stroke={MAP_SURFACE.regionStroke}
-                    strokeWidth={1.2}
-                    strokeDasharray="5 4"
-                  />
-                );
-              })}
-            </g>
+            {selectionRing ? (
+              <ellipse
+                aria-hidden
+                cx={selectionRing.bx}
+                cy={selectionRing.by}
+                rx={selectionRing.bw / 2}
+                ry={selectionRing.bh / 2}
+                fill={MAP_SURFACE.regionFill}
+                stroke={MAP_SURFACE.regionStroke}
+                strokeWidth={1.2}
+                strokeDasharray="5 4"
+                className="pointer-events-none"
+              />
+            ) : null}
 
             {!reduce
               ? arcs.map((arc) => (

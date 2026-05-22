@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import { KEYRA_LOGO_SRC } from "@/lib/keyraBrandAssets";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -16,9 +23,9 @@ export const metadata: Metadata = {
     "Explore Keyra's published regional, country, and operator deployment posture — calm, structured, and institutionally grounded.",
   metadataBase: new URL("https://keyra.ie"),
   icons: {
-    icon: "/kerya-logo.png",
-    shortcut: "/kerya-logo.png",
-    apple: "/kerya-logo.png",
+    icon: KEYRA_LOGO_SRC,
+    shortcut: KEYRA_LOGO_SRC,
+    apple: KEYRA_LOGO_SRC,
   },
   openGraph: {
     title: "Keyra — Global Deployment",
@@ -38,10 +45,19 @@ export default function RootLayout({
   return (
     <html
       lang="en-IE"
-      data-keyra-lane="enterprise"
-      className={`${inter.variable} h-full antialiased`}
+      data-keyra-lane="consumer"
+      className={`${inter.variable} ${montserrat.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=optional"
+        />
+      </head>
       <body className="flex min-h-full min-w-0 flex-col font-sans" suppressHydrationWarning>
         {children}
       </body>

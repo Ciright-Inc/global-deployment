@@ -12,11 +12,11 @@ const POLL_MS = 90_000;
 
 export function useDeploymentMapData({
   initialTree,
-  selectedMapKey,
+  selectedRegionId,
   enablePolling = true,
 }: {
   initialTree: PublicDeploymentTree;
-  selectedMapKey: string | null;
+  selectedRegionId: string | null;
   /** Refetch admin registry for near-live updates without full navigation. */
   enablePolling?: boolean;
 }) {
@@ -47,26 +47,31 @@ export function useDeploymentMapData({
 
   const allNodes = useMemo(() => flattenPublishedCountries(tree.regions), [tree.regions]);
 
+  const selectedRegion = useMemo(
+    () => (selectedRegionId ? tree.regions.find((r) => r.id === selectedRegionId) ?? null : null),
+    [tree.regions, selectedRegionId],
+  );
+
   const dimmedIsoKeys = useMemo(() => {
-    if (!selectedMapKey) return null as Set<string> | null;
+    if (!selectedRegionId) return null as Set<string> | null;
     const allowed = new Set<string>();
     for (const r of tree.regions) {
-      if (r.mapKey !== selectedMapKey) continue;
+      if (r.id !== selectedRegionId) continue;
       for (const c of r.countries) allowed.add(c.iso2.trim().toUpperCase());
     }
     return allowed;
-  }, [tree.regions, selectedMapKey]);
+  }, [tree.regions, selectedRegionId]);
 
   const visibleNodes = useMemo(() => {
-    if (!selectedMapKey) return allNodes;
-    return allNodes.filter((n) => n.mapKey === selectedMapKey);
-  }, [allNodes, selectedMapKey]);
+    if (!selectedRegionId) return allNodes;
+    return allNodes.filter((n) => n.regionId === selectedRegionId);
+  }, [allNodes, selectedRegionId]);
 
   const clustered = useMemo(() => clusterNodes(visibleNodes, zoom), [visibleNodes, zoom]);
 
   const filteredTree = useMemo(
-    () => filterPublicTree(tree, { mapKey: selectedMapKey ?? undefined }),
-    [tree, selectedMapKey],
+    () => filterPublicTree(tree, { regionId: selectedRegionId ?? undefined }),
+    [tree, selectedRegionId],
   );
 
   return {
@@ -76,6 +81,7 @@ export function useDeploymentMapData({
     allNodes,
     visibleNodes,
     dimmedIsoKeys,
+    selectedRegion,
     refetch,
     zoom,
     setZoom,

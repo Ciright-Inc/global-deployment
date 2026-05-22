@@ -2,21 +2,19 @@
 
 import { deploymentStatusPresentation } from "@/lib/deployments/status";
 import type { DeploymentMapFlatNode } from "@/lib/deployments/deployment-map-utils";
-import { WORLD_REGION_PATHS } from "@/lib/deployments/worldRegionPaths";
 
 export function DeploymentMapScreenReaderAnnex({
   visibleNodes,
-  selectedMapKey,
+  selectedRegionId,
+  selectedRegionName,
   onInspectCountry,
 }: {
   visibleNodes: DeploymentMapFlatNode[];
-  selectedMapKey: string | null;
+  selectedRegionId: string | null;
+  selectedRegionName: string | null;
   onInspectCountry: (countryId: string) => void;
 }) {
-  const filterLabel =
-    selectedMapKey && WORLD_REGION_PATHS[selectedMapKey]?.label
-      ? WORLD_REGION_PATHS[selectedMapKey]!.label
-      : "All regions";
+  const filterLabel = selectedRegionId && selectedRegionName ? selectedRegionName : "All regions";
 
   return (
     <section

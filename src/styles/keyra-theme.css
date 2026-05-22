@@ -588,10 +588,14 @@
 /* -------------------------------------------------------------------------- */
 
 .keyra-site-header-shell {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  flex-shrink: 0;
   border-bottom: 1px solid var(--color-hairline);
-  background: color-mix(in srgb, var(--color-canvas) 90%, transparent);
+  background: color-mix(in srgb, var(--keyra-bg) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

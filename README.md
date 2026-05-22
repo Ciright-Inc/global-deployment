@@ -26,6 +26,8 @@ The main Keyra app at `http://localhost:3030/global-deployment` redirects here.
 | `DATABASE_URL` | Same PostgreSQL as main Keyra (deployment registry tables) |
 | `NEXT_PUBLIC_GLOBAL_DEPLOYMENT_URL` | This site's public origin |
 | `NEXT_PUBLIC_KEYRA_SITE_URL` | Main Keyra marketing site (ecosystem links) |
+| `NEXT_PUBLIC_SIMSECURE_AUTH_BACKEND_URL` | Shared auth API (same as Keyra; enables signed-in header + ElevenLabs context) |
+| `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` | ConvAI widget agent (same as keyra.ie; allow this site’s origin in ElevenLabs Security) |
 | `MANDRILL_API_KEY` / `MANDRILL_FROM_EMAIL` | Optional; server access verification emails |
 
 Schema migrations are owned by the **Keyra root** app (`prisma/migrations/`). This app only runs `prisma generate`.

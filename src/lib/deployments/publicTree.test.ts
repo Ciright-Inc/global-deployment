@@ -35,4 +35,36 @@ describe("filterPublicTree", () => {
     expect(filtered.regions[0]?.mapKey).toBe("EUROPE");
     expect(tree.regions).toHaveLength(2);
   });
+
+  it("filters by regionId", () => {
+    const tree: PublicDeploymentTree = {
+      mapKeys: ["EUROPE", "AFRICA"],
+      regions: [
+        {
+          id: "r1",
+          continentCode: "150",
+          subregionCode: "154",
+          name: "Northern Europe",
+          slug: "ne",
+          mapKey: "EUROPE",
+          sortOrder: 1,
+          countries: [],
+        },
+        {
+          id: "r2",
+          continentCode: "002",
+          subregionCode: "011",
+          name: "Western Africa",
+          slug: "wf",
+          mapKey: "AFRICA",
+          sortOrder: 2,
+          countries: [],
+        },
+      ],
+    };
+
+    const filtered = filterPublicTree(tree, { regionId: "r2" });
+    expect(filtered.regions).toHaveLength(1);
+    expect(filtered.regions[0]?.id).toBe("r2");
+  });
 });

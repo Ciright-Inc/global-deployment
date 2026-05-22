@@ -20,8 +20,23 @@ const defaultUser: KeyraSessionUser = {
   phoneE164: "",
 };
 
+type AuthSessionPayload = {
+  authenticated: boolean;
+  user?: { phone?: string; username?: string | null; fullName?: string | null } | null;
+};
+
+function authSessionDisplayName(
+  user: NonNullable<AuthSessionPayload["user"]>,
+): string | undefined {
+  const username = typeof user.username === "string" ? user.username.trim() : "";
+  if (username) return username;
+  const fullName = typeof user.fullName === "string" ? user.fullName.trim() : "";
+  if (fullName) return fullName;
+  return undefined;
+}
+
 async function fetchSessionUser(signal?: AbortSignal): Promise<KeyraSessionUser | null> {
-  let payload: { authenticated: boolean; user?: { phone?: string } | null } | null = null;
+  let payload: AuthSessionPayload | null = null;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), SESSION_TIMEOUT_MS);
 
@@ -65,7 +80,10 @@ async function fetchSessionUser(signal?: AbortSignal): Promise<KeyraSessionUser 
     return null;
   }
   const phone = payload.user.phone.startsWith("+") ? payload.user.phone : `+${payload.user.phone}`;
-  return { phoneE164: phone };
+  return {
+    phoneE164: phone,
+    displayName: authSessionDisplayName(payload.user),
+  };
 }
 
 type KeyraSessionContextValue = {

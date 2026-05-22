@@ -4,30 +4,44 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { useKeyraSession } from "@/contexts/KeyraSessionContext";
-import { buildGetStartedAccessUrl, keyraDeveloperPortalUrl, keyraMarketingOrigin } from "@/lib/keyraAppUrls";
+import {
+  buildGetStartedAccessUrl,
+  keyraDeveloperPortalUrl,
+  keyraMarketingOrigin,
+} from "@/lib/keyraAppUrls";
+import { usePathname, useRouter } from "next/navigation";
+import { useClientReady } from "@/lib/useClientReady";
 import { globalDeploymentOrigin } from "@/lib/site-branding";
 
 type NavLink = { href: string; label: string; external?: boolean };
 
 function buildLinks(marketing: string): NavLink[] {
   return [
-    { href: `${marketing}/#problem`, label: "Why identity" },
-    { href: `${marketing}/#missing-layer`, label: "The shift" },
-    { href: `${marketing}/#for`, label: "Who it's for" },
-    { href: `${marketing}/#global`, label: "Global" },
+    { href: `${marketing}/#problem`, label: "Why identity", external: true },
+    { href: `${marketing}/#missing-layer`, label: "The shift", external: true },
+    { href: `${marketing}/#for`, label: "Who it's for", external: true },
+    { href: `${marketing}/#global`, label: "Global", external: true },
     { href: keyraDeveloperPortalUrl(), label: "Developers", external: true },
-    { href: `${marketing}/`, label: "Be Protected Online" },
+    { href: `${marketing}/`, label: "Be Protected Online", external: true },
   ];
 }
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
-  const { user } = useKeyraSession();
+  const { user, logout } = useKeyraSession();
+  const router = useRouter();
+  const clientReady = useClientReady();
+  const pathname = usePathname();
   const marketing = keyraMarketingOrigin();
-  const accessHref = useMemo(
-    () => buildGetStartedAccessUrl(`${globalDeploymentOrigin()}/`),
-    [],
-  );
+  const accessHref = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return buildGetStartedAccessUrl(
+        `${globalDeploymentOrigin()}${pathname}${window.location.search || ""}`,
+      );
+    }
+    const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+    return buildGetStartedAccessUrl(`${globalDeploymentOrigin()}${path}`);
+  }, [pathname]);
   const links = useMemo(() => buildLinks(marketing), [marketing]);
 
   useEffect(() => {
@@ -56,22 +70,22 @@ export function MobileNav() {
           <>
             <motion.div
               key="mobile-nav-backdrop"
-              className="fixed inset-x-0 bottom-0 top-44 z-[var(--keyra-z-overlay)] bg-black/40 backdrop-blur-[1px] lg:hidden"
+              className="fixed inset-x-0 bottom-0 top-[var(--keyra-header-offset)] z-[var(--keyra-z-overlay)] cursor-pointer bg-black/40 backdrop-blur-[1px] lg:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.12 }}
               aria-hidden
               onClick={() => setOpen(false)}
             />
             <motion.nav
               key="mobile-nav-panel"
               id="mobile-nav-panel"
-              className="fixed left-0 right-0 top-44 z-[var(--keyra-z-drawer)] max-h-[min(75dvh,calc(100dvh-11rem))] overflow-y-auto border-b border-keyra-border bg-keyra-bg/98 px-4 py-4 shadow-lg backdrop-blur-md lg:hidden"
-              initial={{ opacity: 0, y: -8 }}
+              className="fixed left-0 right-0 top-[var(--keyra-header-offset)] z-[var(--keyra-z-drawer)] max-h-[min(75dvh,calc(100dvh-var(--keyra-header-offset)-1rem))] overflow-y-auto border-b border-keyra-border bg-keyra-bg/98 px-4 py-4 shadow-lg backdrop-blur-md lg:hidden"
+              initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.12 }}
               aria-label="Mobile primary"
             >
               <ul className="flex flex-col gap-1">
@@ -79,10 +93,10 @@ export function MobileNav() {
                   <li key={item.label}>
                     <a
                       href={item.href}
-                      target={item.external ? "_blank" : undefined}
+                      target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setOpen(false)}
-                      className="block rounded-lg px-3 py-2.5 text-sm font-medium text-keyra-primary hover:bg-keyra-surface"
+                      className="block rounded-lg px-3 py-2.5 text-sm font-medium text-keyra-primary transition-colors duration-150 active:bg-keyra-surface hover:bg-keyra-surface"
                     >
                       {item.label}
                     </a>
@@ -93,10 +107,25 @@ export function MobileNav() {
                     <a
                       href={accessHref}
                       onClick={() => setOpen(false)}
-                      className="block rounded-lg px-3 py-2.5 text-sm font-medium text-keyra-accent hover:bg-keyra-surface"
+                      className="block rounded-lg px-3 py-2.5 text-sm font-medium text-keyra-accent transition-colors duration-150 active:bg-keyra-surface hover:bg-keyra-surface"
                     >
                       Access
                     </a>
+                  </li>
+                ) : null}
+                {user ? (
+                  <li>
+                    <button
+                      type="button"
+                      className="block w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-keyra-primary transition-colors duration-150 active:bg-keyra-surface hover:bg-keyra-surface"
+                      onClick={async () => {
+                        await logout();
+                        setOpen(false);
+                        if (clientReady) router.refresh();
+                      }}
+                    >
+                      Log out
+                    </button>
                   </li>
                 ) : null}
               </ul>

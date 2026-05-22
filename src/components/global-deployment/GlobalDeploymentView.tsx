@@ -14,7 +14,7 @@ import { useDeploymentMapData } from "@/components/global-deployment/useDeployme
 export function GlobalDeploymentView({ initialAdminTree }: { initialAdminTree: PublicDeploymentTree }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedMapKey, setSelectedMapKey] = useState<string | null>(null);
+  const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
   const [expandedCountryId, setExpandedCountryId] = useState<string | null>(null);
   const [inspectCountryId, setInspectCountryId] = useState<string | null>(null);
   const [dialog, setDialog] = useState<null | { targetType: "COUNTRY" | "TELCO"; targetId: string; title: string }>(
@@ -27,7 +27,7 @@ export function GlobalDeploymentView({ initialAdminTree }: { initialAdminTree: P
     }
   }, [inspectCountryId]);
 
-  const mapData = useDeploymentMapData({ initialTree: initialAdminTree, selectedMapKey });
+  const mapData = useDeploymentMapData({ initialTree: initialAdminTree, selectedRegionId });
 
   let inspected: { country: PublicCountry; regionName: string } | null = null;
   if (inspectCountryId) {
@@ -72,8 +72,8 @@ export function GlobalDeploymentView({ initialAdminTree }: { initialAdminTree: P
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
       <DeploymentMapSection
         mapData={mapData}
-        selectedMapKey={selectedMapKey}
-        onSelectMapKey={setSelectedMapKey}
+        selectedRegionId={selectedRegionId}
+        onSelectRegionId={setSelectedRegionId}
         onCountryInspect={setInspectCountryId}
         inspectCountryId={inspectCountryId}
       />

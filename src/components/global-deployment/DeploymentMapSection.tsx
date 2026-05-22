@@ -7,14 +7,14 @@ import type { UseDeploymentMapDataReturn } from "@/components/global-deployment/
 
 export function DeploymentMapSection({
   mapData,
-  selectedMapKey,
-  onSelectMapKey,
+  selectedRegionId,
+  onSelectRegionId,
   onCountryInspect,
   inspectCountryId,
 }: {
   mapData: UseDeploymentMapDataReturn;
-  selectedMapKey: string | null;
-  onSelectMapKey: (mapKey: string | null) => void;
+  selectedRegionId: string | null;
+  onSelectRegionId: (regionId: string | null) => void;
   onCountryInspect: (countryId: string | null) => void;
   inspectCountryId: string | null;
 }) {
@@ -23,7 +23,7 @@ export function DeploymentMapSection({
   return (
     <section className="keyra-card overflow-hidden rounded-[var(--keyra-radius-xl)] border border-keyra-border bg-keyra-bg shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.04)]">
       <div className="border-b border-keyra-border bg-keyra-surface/50 px-4 py-4 sm:px-5 sm:py-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4">
           <div className="min-w-0">
             <h2 className="text-lg font-semibold tracking-tight text-keyra-primary sm:text-xl">Deployment map</h2>
             <p className="mt-1 text-[13px] text-keyra-text-2">
@@ -31,10 +31,9 @@ export function DeploymentMapSection({
             </p>
           </div>
           <RegionFilterTabs
-            mapKeys={mapData.tree.mapKeys}
-            selectedMapKey={selectedMapKey}
-            onSelectMapKey={onSelectMapKey}
-            className="lg:max-w-[28rem] lg:justify-end"
+            regions={mapData.tree.regions}
+            selectedRegionId={selectedRegionId}
+            onSelectRegionId={onSelectRegionId}
           />
         </div>
       </div>
@@ -43,8 +42,7 @@ export function DeploymentMapSection({
         <GlobalDeploymentMap
           embedded
           mapData={mapData}
-          selectedMapKey={selectedMapKey}
-          onSelectMapKey={onSelectMapKey}
+          selectedRegionId={selectedRegionId}
           onCountryInspect={onCountryInspect}
           inspectCountryId={inspectCountryId}
         />
@@ -52,7 +50,8 @@ export function DeploymentMapSection({
 
       <DeploymentMapScreenReaderAnnex
         visibleNodes={mapData.visibleNodes}
-        selectedMapKey={selectedMapKey}
+        selectedRegionId={selectedRegionId}
+        selectedRegionName={mapData.selectedRegion?.name ?? null}
         onInspectCountry={onCountryInspect}
       />
     </section>

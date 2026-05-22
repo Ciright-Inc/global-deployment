@@ -187,9 +187,12 @@ export async function getPublicDeploymentTree(): Promise<PublicDeploymentTree> {
 
 export function filterPublicTree(
   tree: PublicDeploymentTree,
-  filters: { continentCode?: string; subregionCode?: string; mapKey?: string },
+  filters: { continentCode?: string; subregionCode?: string; mapKey?: string; regionId?: string },
 ): PublicDeploymentTree {
   let regions = tree.regions;
+  if (filters.regionId) {
+    regions = regions.filter((r) => r.id === filters.regionId);
+  }
   if (filters.mapKey) {
     regions = regions.filter((r) => r.mapKey === filters.mapKey);
   }
