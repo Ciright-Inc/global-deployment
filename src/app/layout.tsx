@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
+import { GovernmentsAnalyticsScripts } from "@/components/analytics/GovernmentsAnalyticsScripts";
 import "./globals.css";
 import { KEYRA_LOGO_SRC } from "@/lib/keyraBrandAssets";
 
@@ -61,6 +62,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-full min-w-0 flex-col font-sans" suppressHydrationWarning>
+        <GovernmentsAnalyticsScripts />
         {children}
       </body>
     </html>
