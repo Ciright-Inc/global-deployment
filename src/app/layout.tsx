@@ -21,7 +21,9 @@ export const metadata: Metadata = {
   },
   description:
     "Explore Keyra's published regional, country, and operator deployment posture — calm, structured, and institutionally grounded.",
-  metadataBase: new URL("https://keyra.ie"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_GLOBAL_DEPLOYMENT_URL?.trim() || "https://governments.keyra.ie",
+  ),
   icons: {
     icon: KEYRA_LOGO_SRC,
     shortcut: KEYRA_LOGO_SRC,

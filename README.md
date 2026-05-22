@@ -34,7 +34,7 @@ Schema migrations are owned by the **Keyra root** app (`prisma/migrations/`). Th
 
 ## Production
 
-Deploy as its own Railway service with root directory `global-deployment`. Point `DATABASE_URL` at the shared Postgres and set `NEXT_PUBLIC_GLOBAL_DEPLOYMENT_URL` to the public hostname (e.g. `https://global.keyra.ie`).
+Deploy as its own Railway service with root directory `global-deployment`. Point `DATABASE_URL` at the shared Postgres and set `NEXT_PUBLIC_GLOBAL_DEPLOYMENT_URL` to the public hostname (`https://governments.keyra.ie`).
 
 Admin edits remain on the main Keyra app at `/admin/deployments`.
 

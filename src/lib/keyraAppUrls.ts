@@ -105,7 +105,7 @@ export function keyraMarketingPath(path: string): string {
   return `${base}${p}`;
 }
 
-/** Standalone global deployment site (e.g. global.keyra.ie or http://localhost:3050). */
+/** Standalone global deployment site (e.g. https://governments.keyra.ie or http://localhost:3050). */
 export function keyraGlobalDeploymentUrl(): string {
   return trimSlash(
     process.env.NEXT_PUBLIC_GLOBAL_DEPLOYMENT_URL?.trim() ||
