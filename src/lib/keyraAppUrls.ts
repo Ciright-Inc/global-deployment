@@ -90,12 +90,22 @@ export function keyraPartnersUrl(): string {
   return trimSlash(process.env.NEXT_PUBLIC_PARTNERS_URL?.trim() || "https://partners.keyra.ie");
 }
 
+/** Canonical marketing origin for public CMS APIs (footer, etc.). */
+export function keyraMarketingPublicOrigin(): string {
+  return trimSlash(
+    process.env.NEXT_PUBLIC_KEYRA_MARKETING_ORIGIN?.trim() ||
+      process.env.NEXT_PUBLIC_KEYRA_SITE_URL?.trim() ||
+      process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+      "https://keyra.ie",
+  );
+}
+
 /** This marketing site (e.g. https://keyra.ie or http://localhost:3030). */
 export function keyraMarketingOrigin(): string {
   return trimSlash(
     process.env.NEXT_PUBLIC_KEYRA_SITE_URL?.trim() ||
       process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
-      "https://keyra.ie",
+      keyraMarketingPublicOrigin(),
   );
 }
 
@@ -187,6 +197,13 @@ export function getKeyraEcosystemAppLinks(): KeyraEcosystemAppLink[] {
       href: keyraPartnersUrl(),
     },
   ];
+}
+
+/** Same-origin launcher API — same path as Keyra (`/api/deployments/apps/launcher`). */
+export function keyraLauncherAppsApiUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_KEYRA_LAUNCHER_APPS_URL?.trim();
+  if (explicit) return explicit.replace(/\/+$/, "");
+  return "/api/deployments/apps/launcher";
 }
 
 /** Full app directory used by the admin Apps tab and the 9-dot launcher. */

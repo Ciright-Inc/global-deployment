@@ -79,7 +79,7 @@ export function SiteHeader() {
           </div>
         </nav>
 
-        <div className="relative z-10 flex w-full min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-1 gap-y-1 py-0.5 lg:col-start-3 lg:row-start-1 lg:w-auto lg:flex-nowrap lg:justify-end lg:gap-0 lg:py-0.5 lg:pl-0 xl:gap-0 xl:pl-0">
+        <div className="relative z-10 flex w-full min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-1 gap-y-1 overflow-visible py-0.5 lg:col-start-3 lg:row-start-1 lg:w-auto lg:flex-nowrap lg:justify-end lg:gap-0 lg:py-0.5 lg:pl-0 xl:gap-0 xl:pl-0">
           <MobileNav />
           <AccountMenu />
 
