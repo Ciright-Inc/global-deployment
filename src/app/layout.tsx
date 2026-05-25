@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import { GovernmentsAnalyticsScripts } from "@/components/analytics/GovernmentsAnalyticsScripts";
 import "./globals.css";
-import { KEYRA_LOGO_SRC } from "@/lib/keyraBrandAssets";
+import { KEYRA_FAVICON_SRC } from "@/lib/keyraBrandAssets";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_GLOBAL_DEPLOYMENT_URL?.trim() || "https://governments.keyra.ie",
   ),
   icons: {
-    icon: KEYRA_LOGO_SRC,
-    shortcut: KEYRA_LOGO_SRC,
-    apple: KEYRA_LOGO_SRC,
+    icon: KEYRA_FAVICON_SRC,
+    shortcut: KEYRA_FAVICON_SRC,
+    apple: KEYRA_FAVICON_SRC,
   },
   openGraph: {
     title: "Keyra — Global Deployment",
